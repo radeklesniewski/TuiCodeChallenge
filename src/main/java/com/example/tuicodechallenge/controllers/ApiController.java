@@ -1,8 +1,8 @@
 package com.example.tuicodechallenge.controllers;
 
-import com.example.tuicodechallenge.clients.github.GitHubClient;
+import com.example.tuicodechallenge.http.client.github.GitHubClient;
 import com.example.tuicodechallenge.model.ApiResponse;
-import com.example.tuicodechallenge.model.client.Repository;
+import com.example.tuicodechallenge.http.client.github.model.Repository;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,7 +21,7 @@ public class ApiController {
 
     @GetMapping("/repositories")
     public List<ApiResponse> repositories() {
-        List<Repository> repositoryList = gitHubClient.getUsersRepositories("radeklesniewski")
+        List<Repository> repositoryList = gitHubClient.listUserRepositories("radeklesniewski")
                 .stream()
                 .filter(repository -> !repository.fork())
                 .toList();
@@ -32,7 +32,7 @@ public class ApiController {
     }
 
     private List<ApiResponse.ApiBranch> getRepositoryBranches(String repositoryName) {
-        return gitHubClient.getRepositoryBranches("radeklesniewski", repositoryName)
+        return gitHubClient.listRepositoryBranches("radeklesniewski", repositoryName)
                 .stream()
                 .map(branch -> new ApiResponse.ApiBranch(branch.name(), branch.commit().sha()))
                 .toList();
