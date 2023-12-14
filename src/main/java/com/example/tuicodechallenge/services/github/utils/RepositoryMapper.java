@@ -3,11 +3,9 @@ package com.example.tuicodechallenge.services.github.utils;
 import com.example.tuicodechallenge.model.Repository;
 import com.example.tuicodechallenge.services.github.model.GitHubBranch;
 import com.example.tuicodechallenge.services.github.model.GithubRepository;
-import lombok.experimental.UtilityClass;
 
 import java.util.List;
 
-@UtilityClass
 public class RepositoryMapper {
 
     public static Repository mapToRepository(GithubRepository githubRepository, List<Repository.Branch> branchList) {

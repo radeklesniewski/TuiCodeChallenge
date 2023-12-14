@@ -1,6 +1,7 @@
-package com.example.tuicodechallenge.clients.github
+package com.example.tuicodechallenge.services.github.clients
 
 import com.example.tuicodechallenge.TuiCodeChallengeApplication
+import com.example.tuicodechallenge.exceptions.NotFoundException
 import com.example.tuicodechallenge.services.github.client.GitHubClient
 import com.example.tuicodechallenge.services.github.model.GitHubBranch
 import com.example.tuicodechallenge.services.github.model.GithubRepository
@@ -12,6 +13,7 @@ import org.springframework.test.web.client.MockRestServiceServer
 import spock.lang.Specification
 
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withResourceNotFound
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
 
 @ContextConfiguration(classes = TuiCodeChallengeApplication)
@@ -40,7 +42,7 @@ class GitHubClientTest extends Specification {
         githubClient.getGithubApiRepoBranchesPath() == "/repos/%s/%s/branches"
     }
 
-    def "should handle empty repositories list returned from API"() {
+    def "listUserRepositories should handle empty repositories list returned from API"() {
         given:
         mockRestServiceServer
                 .expect(requestTo(githubClient.getGithubApiHost() + githubClient.getGithubApiUsersReposPath().formatted(username)))
@@ -53,7 +55,7 @@ class GitHubClientTest extends Specification {
         repositories.isEmpty()
     }
 
-    def "should handle non empty repositories list returned from API"() {
+    def "listUserRepositories should handle non empty repositories list returned from API"() {
         given:
         def responsePayloadFile = new File("src/test/resources/payloads/listRepositoriesExampleResponse.json")
 
@@ -68,7 +70,7 @@ class GitHubClientTest extends Specification {
         repositories == [new GithubRepository("Hello-World", new GithubRepository.Owner("octocat"), false)]
     }
 
-    def "should handle empty branches list returned from API"() {
+    def "listRepositoryBranches should handle empty branches list returned from API"() {
         given:
         mockRestServiceServer
                 .expect(requestTo(githubClient.getGithubApiHost() + githubClient.getGithubApiRepoBranchesPath().formatted(username, repository)))
@@ -81,7 +83,7 @@ class GitHubClientTest extends Specification {
         branches.isEmpty()
     }
 
-    def "should handle non empty branches list returned from API"() {
+    def "listRepositoryBranches should handle non empty branches list returned from API"() {
         given:
         def responsePayloadFile = new File("src/test/resources/payloads/listBranchesExampleResponse.json")
 
@@ -96,7 +98,7 @@ class GitHubClientTest extends Specification {
         branches == [new GitHubBranch("master", new GitHubBranch.Commit("c5b97d5ae6c19d5c5df71a34c7fbeeda2479ccbc")), new GitHubBranch("test", new GitHubBranch.Commit("f4de75cddec89b621bd8416dafcc33e4cf0cda82"))]
     }
 
-    def "should fail when null parameter in method listRepositoryBranches is provided"() {
+    def "should throw IllegalArgumentException when null parameter in method listRepositoryBranches is provided"() {
         when:
         githubClient.listRepositoryBranches(username, repository)
 
@@ -110,12 +112,38 @@ class GitHubClientTest extends Specification {
         null     | null
     }
 
-    def "should fail when null parameter in method listUserRepositories is provided"() {
+    def "should throw IllegalArgumentException when null parameter in method listUserRepositories is provided"() {
         when:
         githubClient.listUserRepositories(null)
 
         then:
         thrown(IllegalArgumentException)
+    }
+
+    def "listRepositoryBranches should throw NotFoundException when API returns http 404 code"() {
+        given:
+        mockRestServiceServer
+                .expect(requestTo(githubClient.getGithubApiHost() + githubClient.getGithubApiRepoBranchesPath().formatted(username, repository)))
+                .andRespond(withResourceNotFound())
+
+        when:
+        githubClient.listRepositoryBranches(username, repository)
+
+        then:
+        thrown(NotFoundException)
+    }
+
+    def "listUserRepositories should throw NotFoundException when API returns http 404 code"() {
+        given:
+        mockRestServiceServer
+                .expect(requestTo(githubClient.getGithubApiHost() + githubClient.getGithubApiUsersReposPath().formatted(username)))
+                .andRespond(withResourceNotFound())
+
+        when:
+        githubClient.listUserRepositories(username)
+
+        then:
+        thrown(NotFoundException)
     }
 
 }

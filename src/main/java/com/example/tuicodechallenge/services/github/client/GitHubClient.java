@@ -17,6 +17,8 @@ import java.util.List;
 @Service
 public class GitHubClient {
 
+    private static final String USERNAME_COULD_NOT_BE_FOUND_MSG = "Provided username could not be found.";
+
     @Value("${github.api.host}")
     private String githubApiHost;
 
@@ -37,7 +39,7 @@ public class GitHubClient {
                 .uri(githubApiHost + githubApiUsersReposPath.formatted(username))
                 .retrieve()
                 .onStatus(status -> status.value() == 404, (request, response) -> {
-                    throw new NotFoundException(response.getStatusText());
+                    throw new NotFoundException(USERNAME_COULD_NOT_BE_FOUND_MSG);
                 })
                 .body(new ParameterizedTypeReference<>() {
                 });
