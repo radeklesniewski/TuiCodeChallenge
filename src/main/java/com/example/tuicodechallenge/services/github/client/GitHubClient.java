@@ -26,7 +26,6 @@ public class GitHubClient {
     @Value("${github.api.repo.branches.path}")
     private String githubApiRepoBranchesPath;
 
-    //TODO add error handling https://www.baeldung.com/spring-boot-restclient
     private final RestClient restClient;
 
     public GitHubClient(RestTemplateBuilder restTemplateBuilder) {
@@ -48,6 +47,9 @@ public class GitHubClient {
         return restClient.get()
                 .uri(githubApiHost + githubApiRepoBranchesPath.formatted(username, repository))
                 .retrieve()
+                .onStatus(status -> status.value() == 404, (request, response) -> {
+                    throw new NotFoundException(response.getStatusText());
+                })
                 .body(new ParameterizedTypeReference<>() {
                 });
     }
