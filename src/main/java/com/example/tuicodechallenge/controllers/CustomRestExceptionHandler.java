@@ -3,6 +3,7 @@ package com.example.tuicodechallenge.controllers;
 import com.example.tuicodechallenge.exceptions.NotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;
 import org.springframework.stereotype.Component;
 import org.springframework.web.HttpMediaTypeNotAcceptableException;
@@ -12,6 +13,7 @@ import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
 
 import static org.springframework.http.HttpStatus.*;
 
+@Slf4j
 @Component
 public class CustomRestExceptionHandler extends DefaultHandlerExceptionResolver {
 
@@ -19,14 +21,16 @@ public class CustomRestExceptionHandler extends DefaultHandlerExceptionResolver 
     public static final String STATUS_ATTRIBUTE_NAME = "status";
 
     @Override
-    protected ModelAndView doResolveException(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
+    protected ModelAndView doResolveException(HttpServletRequest request, HttpServletResponse response, Object handler, Exception exception) {
         ModelAndView mav = new ModelAndView();
 
-        mav.addObject(MESSAGE_ATTRIBUTE_NAME, ex.getMessage());
+        logger.info("Handling exception: %s for request: %s".formatted(exception, request.getRequestURI()));
 
-        if (ex instanceof HttpMediaTypeNotAcceptableException) {
+        mav.addObject(MESSAGE_ATTRIBUTE_NAME, exception.getMessage());
+
+        if (exception instanceof HttpMediaTypeNotAcceptableException) {
             mav.addObject(STATUS_ATTRIBUTE_NAME, NOT_ACCEPTABLE.value());
-        } else if (ex instanceof NotFoundException) {
+        } else if (exception instanceof NotFoundException) {
             mav.addObject(STATUS_ATTRIBUTE_NAME, NOT_FOUND.value());
         } else {
             mav.addObject(STATUS_ATTRIBUTE_NAME, INTERNAL_SERVER_ERROR.value());

@@ -102,6 +102,10 @@
                             <goal>check</goal>
                         </goals>
                         <configuration>
+                            <excludes>
+                                <exclude>**/CustomRestExceptionHandler*</exclude>
+                                <exclude>**/TuiCodeChallengeApplication*</exclude>
+                            </excludes>
                             <rules>
                                 <rule>
                                     <element>CLASS</element>

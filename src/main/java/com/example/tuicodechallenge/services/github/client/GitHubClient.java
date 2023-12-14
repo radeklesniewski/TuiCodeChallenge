@@ -8,13 +8,13 @@ import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
 import java.util.List;
 
 @Getter
-@Service
+@Component
 public class GitHubClient {
 
     private static final String USERNAME_COULD_NOT_BE_FOUND_MSG = "Provided username could not be found.";
