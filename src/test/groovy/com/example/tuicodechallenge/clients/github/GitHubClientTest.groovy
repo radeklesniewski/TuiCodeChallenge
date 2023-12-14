@@ -1,9 +1,9 @@
 package com.example.tuicodechallenge.clients.github
 
 import com.example.tuicodechallenge.TuiCodeChallengeApplication
-import com.example.tuicodechallenge.http.client.github.GitHubClient
-import com.example.tuicodechallenge.http.client.github.model.Branch
-import com.example.tuicodechallenge.http.client.github.model.Repository
+import com.example.tuicodechallenge.services.github.http.client.GitHubClient
+import com.example.tuicodechallenge.services.github.model.GitHubBranch
+import com.example.tuicodechallenge.services.github.model.GithubRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest
 import org.springframework.http.MediaType
@@ -65,7 +65,7 @@ class GitHubClientTest extends Specification {
         def repositories = githubClient.listUserRepositories(username)
 
         then:
-        repositories == [new Repository("Hello-World", new Repository.Owner("octocat"), false)]
+        repositories == [new GithubRepository("Hello-World", new GithubRepository.Owner("octocat"), false)]
     }
 
     def "should handle empty branches list returned from API"() {
@@ -93,7 +93,7 @@ class GitHubClientTest extends Specification {
         def branches = githubClient.listRepositoryBranches(username, repository)
 
         then:
-        branches == [new Branch("master", new Branch.Commit("c5b97d5ae6c19d5c5df71a34c7fbeeda2479ccbc")), new Branch("test", new Branch.Commit("f4de75cddec89b621bd8416dafcc33e4cf0cda82"))]
+        branches == [new GitHubBranch("master", new GitHubBranch.Commit("c5b97d5ae6c19d5c5df71a34c7fbeeda2479ccbc")), new GitHubBranch("test", new GitHubBranch.Commit("f4de75cddec89b621bd8416dafcc33e4cf0cda82"))]
     }
 
     def "should fail when null parameter in method listRepositoryBranches is provided"() {

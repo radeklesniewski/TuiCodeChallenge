@@ -1,8 +1,9 @@
 package com.example.tuicodechallenge.controllers;
 
-import com.example.tuicodechallenge.http.client.github.GitHubClient;
-import com.example.tuicodechallenge.model.ApiResponse;
-import com.example.tuicodechallenge.http.client.github.model.Repository;
+import com.example.tuicodechallenge.services.UserRepositoriesService;
+import com.example.tuicodechallenge.services.github.http.client.GitHubClient;
+import com.example.tuicodechallenge.model.Repository;
+import com.example.tuicodechallenge.services.github.model.GithubRepository;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -13,28 +14,15 @@ import java.util.List;
 @RequestMapping("/github")
 public class ApiController {
 
-    private final GitHubClient gitHubClient;
+    private final UserRepositoriesService userRepositoriesService;
 
-    public ApiController(GitHubClient githubClient) {
-        this.gitHubClient = githubClient;
+    public ApiController(UserRepositoriesService userRepositoriesService) {
+        this.userRepositoriesService = userRepositoriesService;
     }
 
     @GetMapping("/repositories")
-    public List<ApiResponse> repositories() {
-        List<Repository> repositoryList = gitHubClient.listUserRepositories("radeklesniewski")
-                .stream()
-                .filter(repository -> !repository.fork())
-                .toList();
-
-        return repositoryList.parallelStream()
-                .map(repository -> new ApiResponse(repository.name(), repository.owner().login(), getRepositoryBranches(repository.name())))
-                .toList();
+    public List<Repository> repositories() {
+        return userRepositoriesService.getUserNonForkedRepositories("radeklesniewski");
     }
 
-    private List<ApiResponse.ApiBranch> getRepositoryBranches(String repositoryName) {
-        return gitHubClient.listRepositoryBranches("radeklesniewski", repositoryName)
-                .stream()
-                .map(branch -> new ApiResponse.ApiBranch(branch.name(), branch.commit().sha()))
-                .toList();
-    }
 }
