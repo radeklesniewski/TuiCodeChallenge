@@ -1,0 +1,43 @@
+package com.example.tuicodechallenge.controllers;
+
+import com.example.tuicodechallenge.exceptions.NotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.core.Ordered;
+import org.springframework.stereotype.Component;
+import org.springframework.web.HttpMediaTypeNotAcceptableException;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolver;
+import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
+
+import static org.springframework.http.HttpStatus.*;
+
+@Component
+public class CustomRestExceptionHandler extends DefaultHandlerExceptionResolver {
+
+    public static final String MESSAGE_ATTRIBUTE_NAME = "message";
+    public static final String STATUS_ATTRIBUTE_NAME = "status";
+
+    @Override
+    protected ModelAndView doResolveException(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
+        ModelAndView mav = new ModelAndView();
+
+        mav.addObject(MESSAGE_ATTRIBUTE_NAME, ex.getMessage());
+
+        if (ex instanceof HttpMediaTypeNotAcceptableException) {
+            mav.addObject(STATUS_ATTRIBUTE_NAME, NOT_ACCEPTABLE.value());
+        } else if (ex instanceof NotFoundException) {
+            mav.addObject(STATUS_ATTRIBUTE_NAME, NOT_FOUND.value());
+        } else {
+            mav.addObject(STATUS_ATTRIBUTE_NAME, INTERNAL_SERVER_ERROR.value());
+        }
+
+        mav.setView(new MappingJackson2JsonView());
+        return mav;
+    }
+
+    @Override
+    public int getOrder() {
+        return Ordered.HIGHEST_PRECEDENCE;
+    }
+}

@@ -1,13 +1,13 @@
 package com.example.tuicodechallenge.controllers;
 
-import com.example.tuicodechallenge.exceptions.NotFoundException;
-import com.example.tuicodechallenge.model.ErrorMessage;
 import com.example.tuicodechallenge.model.Repository;
 import com.example.tuicodechallenge.services.UserRepositoriesService;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -25,10 +25,5 @@ public class UserRepositoriesController {
     public List<Repository> repositories(@PathVariable String username) {
         return userRepositoriesService.getUserNonForkedRepositories(username);
     }
-
-//    @ExceptionHandler({ Exception.class, NotFoundException.class })
-//    public void handleException((HttpServletResponse response, Exception exception) {
-//        return new ErrorMessage(response.getStatus(), exception.getMessage());
-//    }
 
 }
