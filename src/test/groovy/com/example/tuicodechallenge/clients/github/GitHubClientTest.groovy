@@ -1,7 +1,7 @@
 package com.example.tuicodechallenge.clients.github
 
 import com.example.tuicodechallenge.TuiCodeChallengeApplication
-import com.example.tuicodechallenge.services.github.http.client.GitHubClient
+import com.example.tuicodechallenge.services.github.client.GitHubClient
 import com.example.tuicodechallenge.services.github.model.GitHubBranch
 import com.example.tuicodechallenge.services.github.model.GithubRepository
 import org.springframework.beans.factory.annotation.Autowired

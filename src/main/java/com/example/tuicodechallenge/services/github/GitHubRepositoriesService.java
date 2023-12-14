@@ -2,7 +2,7 @@ package com.example.tuicodechallenge.services.github;
 
 import com.example.tuicodechallenge.model.Repository;
 import com.example.tuicodechallenge.services.UserRepositoriesService;
-import com.example.tuicodechallenge.services.github.http.client.GitHubClient;
+import com.example.tuicodechallenge.services.github.client.GitHubClient;
 import com.example.tuicodechallenge.services.github.model.GithubRepository;
 import com.example.tuicodechallenge.services.github.utils.RepositoryMapper;
 import lombok.AllArgsConstructor;

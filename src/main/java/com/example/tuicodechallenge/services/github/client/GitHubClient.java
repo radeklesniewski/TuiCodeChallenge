@@ -1,4 +1,4 @@
-package com.example.tuicodechallenge.services.github.http.client;
+package com.example.tuicodechallenge.services.github.client;
 
 import com.example.tuicodechallenge.exceptions.NotFoundException;
 import com.example.tuicodechallenge.services.github.model.GitHubBranch;
