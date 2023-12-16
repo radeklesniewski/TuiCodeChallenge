@@ -32,13 +32,13 @@ public class CustomRestExceptionHandler extends DefaultHandlerExceptionResolver 
 
         if (exception instanceof HttpMediaTypeNotAcceptableException) {
             mav.addObject(STATUS_ATTRIBUTE_NAME, NOT_ACCEPTABLE.value());
-            response.sendError(NOT_ACCEPTABLE.value());
+            response.setStatus(NOT_ACCEPTABLE.value());
         } else if (exception instanceof NotFoundException) {
             mav.addObject(STATUS_ATTRIBUTE_NAME, NOT_FOUND.value());
-            response.sendError(NOT_FOUND.value());
+            response.setStatus(NOT_FOUND.value());
         } else {
             mav.addObject(STATUS_ATTRIBUTE_NAME, INTERNAL_SERVER_ERROR.value());
-            response.sendError(INTERNAL_SERVER_ERROR.value());
+            response.setStatus(INTERNAL_SERVER_ERROR.value());
         }
 
         mav.setView(new MappingJackson2JsonView());
