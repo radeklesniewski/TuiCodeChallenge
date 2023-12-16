@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.servlet.ModelAndView;
@@ -23,7 +24,7 @@ public class CustomRestExceptionHandler extends DefaultHandlerExceptionResolver 
 
     @SneakyThrows
     @Override
-    protected ModelAndView doResolveException(HttpServletRequest request, HttpServletResponse response, Object handler, Exception exception) {
+    protected ModelAndView doResolveException(HttpServletRequest request, HttpServletResponse response, @Nullable Object handler, Exception exception) {
         ModelAndView mav = new ModelAndView();
 
         logger.info("Handling exception: %s for request: %s".formatted(exception, request.getRequestURI()));
