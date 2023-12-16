@@ -3,6 +3,7 @@ package com.example.tuicodechallenge.controllers;
 import com.example.tuicodechallenge.exceptions.NotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;
 import org.springframework.stereotype.Component;
@@ -20,6 +21,7 @@ public class CustomRestExceptionHandler extends DefaultHandlerExceptionResolver 
     public static final String MESSAGE_ATTRIBUTE_NAME = "message";
     public static final String STATUS_ATTRIBUTE_NAME = "status";
 
+    @SneakyThrows
     @Override
     protected ModelAndView doResolveException(HttpServletRequest request, HttpServletResponse response, Object handler, Exception exception) {
         ModelAndView mav = new ModelAndView();
@@ -30,10 +32,13 @@ public class CustomRestExceptionHandler extends DefaultHandlerExceptionResolver 
 
         if (exception instanceof HttpMediaTypeNotAcceptableException) {
             mav.addObject(STATUS_ATTRIBUTE_NAME, NOT_ACCEPTABLE.value());
+            response.sendError(NOT_ACCEPTABLE.value());
         } else if (exception instanceof NotFoundException) {
             mav.addObject(STATUS_ATTRIBUTE_NAME, NOT_FOUND.value());
+            response.sendError(NOT_FOUND.value());
         } else {
             mav.addObject(STATUS_ATTRIBUTE_NAME, INTERNAL_SERVER_ERROR.value());
+            response.sendError(INTERNAL_SERVER_ERROR.value());
         }
 
         mav.setView(new MappingJackson2JsonView());

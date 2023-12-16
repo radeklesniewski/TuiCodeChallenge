@@ -37,7 +37,7 @@ class GitHubClientTest extends Specification {
 
     def "should resolve all properties"() {
         expect:
-        githubClient.getGithubApiHost() == "https://test.hostname"
+        githubClient.getGithubApiHost() == "http://localhost:8081"
         githubClient.getGithubApiUsersReposPath() == "/users/%s/repos"
         githubClient.getGithubApiRepoBranchesPath() == "/repos/%s/%s/branches"
     }
