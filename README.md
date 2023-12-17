@@ -8,6 +8,21 @@ framework (v2.3).
 
 ## How to run the app
 
+You can simply run the app as a service by invoking command:
+
+```console
+java -jar  target/TuiCodeChallenge-0.0.1-SNAPSHOT.jar
+```
+
+If you have Docker installed you can build the image & run the container by invoking following commands:
+
+```console
+docker build -t com.example/tuicodechallenge .
+docker run -p8080:8080 com.example/tuicodechallenge
+```
+
+## How to deploy to AWS manually or via Jenkins pipeline
+
 [//]: # (TODO)
 
 ## REST API specification and request examples
@@ -16,6 +31,7 @@ Swagger/OpenAPI 3.0 specification can be
 found [here](https://github.com/radeklesniewski/TuiCodeChallenge/blob/b954e0e255c3d3549fa5d34e1b784f285469853d/api_spec.yaml).
 Few examples of curl requests & responses:
 
+```console
 curl http://localhost:8080/user/radeklesniewski/repositories -H "Accept: application/json"
 
 < HTTP/1.1 200
@@ -26,19 +42,23 @@ Neuron","ownerLogin":"radeklesniewski","
 branchList":[{"branchName":"master","lastCommitSha":"efbc0b82c5a2c5c592ec0d96b16de5c07631a9a1"},{"branchName":"test","lastCommitSha":"efbc0b82c5a2c5c592ec0d96b16de5c07631a9a1"}]},{"
 repositoryName":"ScatterSearchForTSP","ownerLogin":"radeklesniewski","
 branchList":[{"branchName":"master","lastCommitSha":"1f4dd5d9c11365f87faf7c6b03b4ccfd5686e690"}]}]
+```
 
+```console
 curl http://localhost:8080/user/radeklesniewski/repositories -H "Accept: application/xml"
 
 < HTTP/1.1 406
 
 {"message":"No acceptable representation","status":406}
+```
 
-curl http://localhost:8080/user/nonExistingUser/repositories -H "Accept: application/json" -v
+```console
+curl http://localhost:8080/user/nonExistingUser/repositories -H "Accept: application/json"
 
 < HTTP/1.1 404
 
 {"message":"Provided username could not be found.","status":404}
-
+```
 ## Unit & Integration tests
 
 [Unit tests (Spock)](https://github.com/radeklesniewski/TuiCodeChallenge/blob/33dbbf21745bce83e32fff5f46e10738f618329f/src/test/groovy/com/example/tuicodechallenge)
