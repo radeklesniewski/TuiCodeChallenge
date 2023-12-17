@@ -1,0 +1,132 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: 'AWS::Serverless-2016-10-31'
+Parameters:
+  ServiceName:
+    Type: String
+    Default: tuicodechallenge
+Resources:
+  ECSCluster:
+    Type: 'AWS::ECS::Cluster'
+    Properties:
+      ClusterName: CFNCluster
+  ECSTaskDefinition:
+    Type: 'AWS::ECS::TaskDefinition'
+    DependsOn: LogGroup
+    Properties:
+      ContainerDefinitions:
+        - Command:
+            - >-
+              java -jar /app.jar
+          Essential: true
+          #tag 'latest' used for simplification, generally it's not recommended to use it for prod apps
+          Image: !Sub "${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/tuicodechallenge:latest"
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref LogGroup
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: ecs
+          Name: tuicodechallenge
+          PortMappings:
+            - ContainerPort: 8080
+              HostPort: 8080
+              Protocol: tcp
+      Cpu: 256
+      ExecutionRoleArn: !Ref ExecutionRole
+      Family: task-definition-cfn
+      Memory: 512
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      RuntimePlatform:
+        OperatingSystemFamily: LINUX
+  ECSService:
+    Type: 'AWS::ECS::Service'
+    DependsOn:
+      - ListenerHTTP
+    Properties:
+      ServiceName: !Ref ServiceName
+      Cluster: !Ref ECSCluster
+      DesiredCount: 1
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          #          TODO replace with parameter values
+          SecurityGroups:
+            - "sg-0dcb6e9ff874f4626"
+          Subnets:
+            - "subnet-0c9f3bc6729ce8264"
+            - "subnet-028a891991411294c"
+            - "subnet-0365a28521c92874f"
+      TaskDefinition: !Ref ECSTaskDefinition
+      LoadBalancers:
+        - ContainerName: 'tuicodechallenge'
+          ContainerPort: 8080
+          TargetGroupArn: !Ref TargetGroup
+  TargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      HealthCheckIntervalSeconds: 60
+      HealthCheckPath: "/actuator/health"
+      HealthCheckTimeoutSeconds: 5
+      Name: !Join [ '', [ !Ref ServiceName, TargetGroup ] ]
+      Port: 8080
+      Protocol: HTTP
+      TargetGroupAttributes:
+        - Key: deregistration_delay.timeout_seconds
+          Value: 60
+      TargetType: ip
+      VpcId: vpc-06b2d17f1896f90bf
+  LoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      LoadBalancerAttributes:
+        - Key: idle_timeout.timeout_seconds
+          Value: 60
+      Name: !Join [ '', [ !Ref ServiceName, LoadBalancer ] ]
+      #          TODO replace with parameter values
+      SecurityGroups:
+        - "sg-0dcb6e9ff874f4626"
+      Subnets:
+        - "subnet-0c9f3bc6729ce8264"
+        - "subnet-028a891991411294c"
+        - "subnet-0365a28521c92874f"
+  ListenerHTTP:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+        - TargetGroupArn: !Ref TargetGroup
+          Type: forward
+      LoadBalancerArn: !Ref LoadBalancer
+      Port: 8080
+      Protocol: HTTP
+  ExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: "tui-example-role"
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy'
+  LogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Join [ '', [ /ecs/, !Ref ServiceName, TaskDefinition ] ]
+  ApiGatewayApi:
+    Type: AWS::Serverless::Api
+    DependsOn:
+      - ECSService
+      - ListenerHTTP
+      - LoadBalancer
+    Properties:
+      StageName: v0
+      DefinitionBody:
+        'Fn::Transform':
+          Name: 'AWS::Include'
+          Parameters:
+            Location: s3://apidefs/api_spec.yaml
