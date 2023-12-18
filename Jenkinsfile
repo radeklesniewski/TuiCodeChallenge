@@ -5,18 +5,20 @@ pipeline {
         string(name: 'AWS_REGION', defaultValue: 'eu-west-1', description: 'AWS region where ecs stack should be deployed')
     }
 
-    stages {
+    steps {
 
         stage('Build application jar') {
             sh "mvn clean package"
         }
 
         stage('Build docker image and push to AWS registry') {
-            sh " aws ecr get-login-password --region ${params.AWS_REGION} | docker login --username AWS --password-stdin ${params.AWS_ACCOUNT_ID}.dkr.ecr.${params.AWS_REGION}.amazonaws.com"
-            sh "aws ecr create-repository --repository-name tuicodechallenge"
-            sh "docker build -t com.example/tuicodechallenge ."
-            sh "docker tag com.example/tuicodechallenge:latest ${params.AWS_ACCOUNT_ID}.dkr.ecr.${params.AWS_REGION}.amazonaws.com/tuicodechallenge"
-            sh "docker push ${params.AWS_ACCOUNT_ID}.dkr.ecr.${params.AWS_REGION}.amazonaws.com/tuicodechallenge"
+            sh '''
+            aws ecr get-login-password --region ${params.AWS_REGION} | docker login --username AWS --password-stdin ${params.AWS_ACCOUNT_ID}.dkr.ecr.${params.AWS_REGION}.amazonaws.com
+            aws ecr create-repository --repository-name tuicodechallenge
+            docker build -t com.example/tuicodechallenge .
+            docker tag com.example/tuicodechallenge:latest ${params.AWS_ACCOUNT_ID}.dkr.ecr.${params.AWS_REGION}.amazonaws.com/tuicodechallenge
+            docker push ${params.AWS_ACCOUNT_ID}.dkr.ecr.${params.AWS_REGION}.amazonaws.com/tuicodechallenge
+            '''
         }
 
         stage('Upload API specification to S3') {
