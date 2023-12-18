@@ -26,13 +26,14 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Repository'
-    x-amazon-apigateway-integration:
-      payloadFormatVersion: "1.0"
-      type: "http_proxy"
-      httpMethod: "GET"
-      uri:
-        Fn::Sub: "arn:aws:elasticloadbalancing:${AWS::Region}:${AWS::AccountId}:listener/app/tuicodechallengeLoadBalancer/${LoadBalancer.Arn}/${ListenerHTTP.ListenerArn}"
-      connectionType: "VPC_LINK"
+      x-amazon-apigateway-integration:
+        payloadFormatVersion: "1.0"
+        connectionId: "r9d46f"
+        type: "http_proxy"
+        httpMethod: "GET"
+        uri:
+          Fn::Sub: "arn:aws:elasticloadbalancing:${AWS::Region}:${AWS::AccountId}:listener/app/tuicodechallengeLoadBalancer/${LoadBalancer.LoadBalancerArn}/${ListenerHTTP.ListenerArn}"
+        connectionType: "VPC_LINK"
 components:
   schemas:
     Branch:

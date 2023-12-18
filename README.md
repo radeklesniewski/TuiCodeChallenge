@@ -23,7 +23,14 @@ docker run -p8080:8080 com.example/tuicodechallenge
 
 ## How to deploy to AWS manually or via Jenkins pipeline
 
-[//]: # (TODO)
+Deployment using AWS CLI:
+
+```console
+ aws cloudformation create-stack --stack-name tui-example-ecs-stack --template-body file://aws/samTemplate.yaml --capabilities CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND
+```
+
+Deployment on Jenkins - please use
+following [Jenkinsfile](https://github.com/radeklesniewski/TuiCodeChallenge/blob/79d43779ec77a72bd9d98cc7fd0b860f1778f9db/Jenkinsfile)
 
 ## REST API specification and request examples
 
