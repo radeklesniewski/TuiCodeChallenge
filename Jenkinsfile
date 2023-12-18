@@ -3,6 +3,7 @@ pipeline {
     parameters {
         string(name: 'AWS_ACCOUNT_ID', defaultValue: '', description: 'AWS account id where ecs stack should be deployed')
         string(name: 'AWS_REGION', defaultValue: 'eu-west-1', description: 'AWS region where ecs stack should be deployed')
+        string(name: 'S3_BUCKET_NAME', defaultValue: 'apidefs', description: 'AWS S3 bucket where API definition can be uploaded')
     }
 
     stages {
@@ -30,7 +31,7 @@ pipeline {
         stage('Upload API specification to S3') {
             steps {
                 withCredentials([aws(credentialsId: "aws_credentials")]) {
-                    sh "aws s3 cp dist s3://apidefs"
+                    sh "aws s3 cp api_spec.yaml s3://${params.S3_BUCKET_NAME}"
                 }
             }
         }
