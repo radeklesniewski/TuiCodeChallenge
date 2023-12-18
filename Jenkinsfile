@@ -5,7 +5,7 @@ pipeline {
         string(name: 'AWS_REGION', defaultValue: 'eu-west-1', description: 'AWS region where ecs stack should be deployed')
     }
 
-    steps {
+    stages {
 
         stage('Build application jar') {
             steps {
